@@ -6,6 +6,10 @@
   <title>FocusHub</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
+<!-- Manifest and PWA support -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4CAF50">
+
 </head>
 <body>
   <div class="container">
@@ -52,6 +56,13 @@
 
   <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
   <script src="script.js"></script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(() => console.log('✅ Service Worker Registered'));
+  }
+</script>
+
 </body>
 </html>
 
