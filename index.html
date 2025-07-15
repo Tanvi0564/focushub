@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusHub</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+</head>
+<body>
+  <div class="container">
+    <h1>FocusHub 🧠</h1>
+
+    <div class="input-group">
+      <input id="taskInput" placeholder="Add a new task..." />
+      <select id="categorySelect">
+        <option value="Study">Study</option>
+        <option value="Work">Work</option>
+        <option value="Shopping">Shopping</option>
+      </select>
+      <button onclick="addTask()">Add</button>
+    </div>
+
+    <progress id="progressBar" value="0" max="100"></progress>
+    <ul id="taskList"></ul>
+
+    <h2>Pomodoro Timer 🍅</h2>
+
+    <div>
+      <label>Focus (min):</label>
+      <input type="number" id="focusInput" min="1" value="25" />
+    </div>
+    <div>
+      <label>Break (min):</label>
+      <input type="number" id="breakInput" min="1" value="5" />
+    </div>
+
+    <div id="timer">Focus: 25:00</div>
+
+    <button onclick="startCustomTimer('focus')">Start Focus</button>
+    <button onclick="startCustomTimer('break')">Start Break</button>
+    <button onclick="stopTimer()">⏹ Stop</button>
+
+    <br><br>
+    <button onclick="toggleDarkMode()">🌗 Toggle Dark Mode</button>
+  </div>
+
+  <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
