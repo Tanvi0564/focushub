@@ -1,118 +1,101 @@
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-let timer;
-let currentMode = 'focus';
+// ========== Task Manager ==========
+let tasks = [];
 
-// === TASK MANAGEMENT ===
 function addTask() {
   const input = document.getElementById('taskInput');
   const category = document.getElementById('categorySelect').value;
-  const taskText = input.value.trim();
-  if (taskText !== '') {
-    tasks.push({ text: taskText, done: false, category });
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    input.value = '';
-    renderTasks();
-  }
+  if (input.value.trim() === '') return;
+
+  const task = { text: input.value, category, done: false };
+  tasks.push(task);
+  input.value = '';
+  renderTasks();
 }
 
 function renderTasks() {
   const list = document.getElementById('taskList');
   list.innerHTML = '';
-  tasks.forEach((task, index) => {
+  let completed = 0;
+
+  tasks.forEach((task, i) => {
     const li = document.createElement('li');
-    const span = document.createElement('span');
-    span.textContent = `[${task.category}] ${task.text}`;
-    span.style.textDecoration = task.done ? 'line-through' : '';
-    span.onclick = () => {
-      tasks[index].done = !tasks[index].done;
-      localStorage.setItem('tasks', JSON.stringify(tasks));
+    li.textContent = `${task.category}: ${task.text}`;
+    li.style.textDecoration = task.done ? 'line-through' : 'none';
+    li.onclick = () => {
+      task.done = !task.done;
       renderTasks();
     };
-    const editBtn = document.createElement('button');
-    editBtn.textContent = '✏️';
-    editBtn.onclick = () => editTask(index);
-    const delBtn = document.createElement('button');
-    delBtn.textContent = '🗑️';
-    delBtn.onclick = () => deleteTask(index);
-    li.appendChild(span);
-    li.appendChild(editBtn);
-    li.appendChild(delBtn);
     list.appendChild(li);
+    if (task.done) completed++;
   });
-  updateProgressBar();
+
+  const percent = tasks.length ? (completed / tasks.length) * 100 : 0;
+  document.getElementById('progressBar').value = percent;
 }
 
-function editTask(index) {
-  const newText = prompt('Edit task:', tasks[index].text);
-  if (newText !== null) {
-    tasks[index].text = newText;
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    renderTasks();
-  }
-}
+// ========== Pomodoro Timer ==========
+let timer;
 
-function deleteTask(index) {
-  tasks.splice(index, 1);
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  renderTasks();
-}
-
-function updateProgressBar() {
-  const completed = tasks.filter(t => t.done).length;
-  const progress = tasks.length ? (completed / tasks.length) * 100 : 0;
-  document.getElementById('progressBar').value = progress;
-}
-
-renderTasks();
-
-// === TIMER FUNCTIONALITY ===
 function startCustomTimer(type) {
-  stopTimer();
-  const focusMin = parseInt(document.getElementById('focusInput').value);
-  const breakMin = parseInt(document.getElementById('breakInput').value);
-  localStorage.setItem('focusTime', focusMin);
-  localStorage.setItem('breakTime', breakMin);
-  let duration = (type === 'focus' ? focusMin : breakMin) * 60;
-  currentMode = type;
-  updateTimerDisplay(type, duration);
+  const minutes = type === 'focus'
+    ? parseInt(document.getElementById('focusInput').value)
+    : parseInt(document.getElementById('breakInput').value);
+
+  let seconds = minutes * 60;
+  const timerEl = document.getElementById('timer');
+  const label = type === 'focus' ? 'Focus' : 'Break';
+
+  clearInterval(timer);
   timer = setInterval(() => {
-    if (--duration < 0) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    timerEl.textContent = `${label}: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    if (--seconds < 0) {
       clearInterval(timer);
       document.getElementById('alarmSound').play();
-      alert(`${type === 'focus' ? 'Focus' : 'Break'} time is over!`);
-      const nextMode = type === 'focus' ? 'break' : 'focus';
-      startCustomTimer(nextMode);
-    } else {
-      updateTimerDisplay(type, duration);
     }
   }, 1000);
 }
 
-function updateTimerDisplay(type, total) {
-  const mins = Math.floor(total / 60);
-  const secs = total % 60;
-  document.getElementById('timer').innerText =
-    `${type.charAt(0).toUpperCase() + type.slice(1)}: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-}
-
 function stopTimer() {
   clearInterval(timer);
-  document.getElementById('timer').innerText = 'Stopped';
+  document.getElementById('timer').textContent = 'Focus: 25:00';
 }
 
-// === THEME SYSTEM ===
+// ========== Theme Toggle ==========
 function setTheme(mode) {
-  document.body.classList.remove('theme-light', 'theme-dark', 'theme-color');
-  document.body.classList.add(`theme-${mode}`);
+  document.body.className = mode;
   localStorage.setItem('theme', mode);
 }
 
-window.addEventListener('load', () => {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  setTheme(savedTheme);
-  const focusSaved = localStorage.getItem('focusTime');
-  const breakSaved = localStorage.getItem('breakTime');
-  if (focusSaved) document.getElementById('focusInput').value = focusSaved;
-  if (breakSaved) document.getElementById('breakInput').value = breakSaved;
+window.onload = () => {
+  const saved = localStorage.getItem('theme');
+  if (saved) setTheme(saved);
+};
+
+// ========== PWA Install ==========
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = 'inline-block';
 });
+
+installBtn.addEventListener('click', () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        console.log('✅ Installed');
+      } else {
+        console.log('❌ Dismissed');
+      }
+      deferredPrompt = null;
+    });
+  }
+});
+
+
 

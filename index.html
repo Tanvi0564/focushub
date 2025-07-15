@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FocusHub</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-<!-- Manifest and PWA support -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4CAF50">
-
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4CAF50">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
   <div class="container">
@@ -45,24 +43,28 @@
     <button onclick="startCustomTimer('break')">Start Break</button>
     <button onclick="stopTimer()">⏹ Stop</button>
 
-    <!-- Theme Toggle Buttons -->
+    <!-- Theme Toggle -->
     <div class="theme-toggle">
       <h3>Theme:</h3>
       <button onclick="setTheme('light')">☀️ Light</button>
       <button onclick="setTheme('dark')">🌙 Dark</button>
       <button onclick="setTheme('color')">🌈 Color</button>
     </div>
+
+    <!-- Install Button -->
+    <button id="installBtn" style="display:none;">📲 Install FocusHub</button>
   </div>
 
   <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
   <script src="script.js"></script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log('✅ Service Worker Registered'));
-  }
-</script>
 
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('✅ Service Worker Registered'))
+        .catch(err => console.error('❌ SW Registration Failed', err));
+    }
+  </script>
 </body>
 </html>
 
